@@ -1,0 +1,54 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <!-- Crust gradient -->
+    <radialGradient id="crustGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="#d89b4c"/>
+      <stop offset="100%" stop-color="#b8742c"/>
+    </radialGradient>
+
+    <!-- Cheese gradient -->
+    <radialGradient id="cheeseGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe27a"/>
+      <stop offset="100%" stop-color="#f4c542"/>
+    </radialGradient>
+
+    <!-- Sauce gradient -->
+    <radialGradient id="sauceGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d32f2f"/>
+      <stop offset="100%" stop-color="#9a0007"/>
+    </radialGradient>
+
+    <!-- Pepperoni gradient -->
+    <radialGradient id="pepGrad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#c62828"/>
+      <stop offset="100%" stop-color="#7f0000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Crust -->
+  <circle cx="250" cy="250" r="230" fill="url(#crustGrad)" />
+
+  <!-- Sauce -->
+  <circle cx="250" cy="250" r="200" fill="url(#sauceGrad)" />
+
+  <!-- Cheese -->
+  <circle cx="250" cy="250" r="180" fill="url(#cheeseGrad)" />
+
+  <!-- Pepperoni slices -->
+  <circle cx="180" cy="170" r="35" fill="url(#pepGrad)" />
+  <circle cx="310" cy="160" r="35" fill="url(#pepGrad)" />
+  <circle cx="360" cy="260" r="35" fill="url(#pepGrad)" />
+  <circle cx="250" cy="330" r="35" fill="url(#pepGrad)" />
+  <circle cx="140" cy="290" r="35" fill="url(#pepGrad)" />
+  <circle cx="250" cy="220" r="35" fill="url(#pepGrad)" />
+
+  <!-- Pepperoni oil shine -->
+  <circle cx="170" cy="160" r="8" fill="#ff8a80" opacity="0.5"/>
+  <circle cx="300" cy="150" r="8" fill="#ff8a80" opacity="0.5"/>
+  <circle cx="350" cy="250" r="8" fill="#ff8a80" opacity="0.5"/>
+  <circle cx="240" cy="320" r="8" fill="#ff8a80" opacity="0.5"/>
+  <circle cx="130" cy="280" r="8" fill="#ff8a80" opacity="0.5"/>
+  <circle cx="240" cy="210" r="8" fill="#ff8a80" opacity="0.5"/>
+
+</svg>
