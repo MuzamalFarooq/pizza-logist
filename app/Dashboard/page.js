@@ -376,7 +376,7 @@ export default function RestaurantDashboard() {
 
   /* ── Render ── */
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
 
       {/* Modals */}
       <PizzaModal
@@ -386,8 +386,10 @@ export default function RestaurantDashboard() {
         onSave={handleSavePizza}
       />
 
-      {/* ── Sidebar ── */}
-      <aside className="w-64 shrink-0 bg-white border-r border-gray-100 shadow-sm flex flex-col">
+      {/* Content wrapper */}
+      <div className="flex flex-1">
+        {/* ── Sidebar ── */}
+        <aside className="fixed left-0 top-0 w-64 h-screen bg-white border-r border-gray-100 shadow-sm flex flex-col overflow-y-auto z-40">
         {/* Brand */}
         <div className="px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -446,7 +448,7 @@ export default function RestaurantDashboard() {
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="ml-64 flex-1 overflow-y-auto">
 
         {/* Top header bar */}
         <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-4 flex items-center justify-between">
@@ -769,6 +771,12 @@ export default function RestaurantDashboard() {
 
         </div>
       </main>
+      </div>
+
+      {/* ── Footer ── */}
+      <footer className="ml-64 bg-white border-t border-gray-100 px-8 py-4 text-center text-xs text-gray-400">
+        <p>&copy; 2024 Pizza Logist. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
