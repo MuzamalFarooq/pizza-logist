@@ -1,6 +1,7 @@
 "use client"
 import { useCart } from '@/context/CartContext';
 import { useState, useEffect } from 'react';
+import PizzaLogisticsLoading from '@/components/PizzaLogisticsLoading';
 
 export default function Home() {
   const { addToCart } = useCart();
@@ -113,9 +114,7 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
+          <PizzaLogisticsLoading />
         ) : error ? (
           <div className="flex justify-center py-20">
             <div className="max-w-md bg-red-50 border-l-4 border-red-500 p-4 rounded">

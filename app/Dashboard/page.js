@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import PizzaLogisticsLoading from "@/components/PizzaLogisticsLoading";
 
 const STATUS_COLORS = {
   pending:           { bg: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-400", ring: "ring-yellow-300" },
@@ -375,6 +376,10 @@ export default function RestaurantDashboard() {
   );
 
   /* ── Render ── */
+  if (loading) {
+    return <PizzaLogisticsLoading />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
 
@@ -538,10 +543,7 @@ export default function RestaurantDashboard() {
 
                 {/* Table body */}
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center py-24 gap-3">
-                    <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-400 text-sm">Loading orders…</p>
-                  </div>
+                  <PizzaLogisticsLoading fullScreen={false} />
                 ) : error ? (
                   <div className="flex flex-col items-center justify-center py-20 gap-2">
                     <span className="text-4xl">⚠️</span>
@@ -733,10 +735,7 @@ export default function RestaurantDashboard() {
 
               {/* Menu Table */}
               {loadingMenu ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-3">
-                  <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-gray-400 text-sm">Loading menu…</p>
-                </div>
+                <PizzaLogisticsLoading fullScreen={false} />
               ) : filteredMenu.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-2">
                   <span className="text-5xl">🍕</span>
