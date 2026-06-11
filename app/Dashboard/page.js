@@ -1,6 +1,8 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import PizzaLogisticsLoading from "@/components/PizzaLogisticsLoading";
+import { io } from "socket.io-client";
+import { IoClose, IoSend } from "react-icons/io5";
 
 const STATUS_COLORS = {
   pending:           { bg: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-400", ring: "ring-yellow-300" },
@@ -25,7 +27,7 @@ function StatCard({ icon, label, value, sub, gradient }) {
 }
 
 /* ─── Order Row ───────────────────────────────────────── */
-function OrderRow({ order, onStatusChange, updating }) {
+function OrderRow({ order, onStatusChange, updating, onChatOpen }) {
   const sc = STATUS_COLORS[order.status] || STATUS_COLORS.pending;
   const dateStr = new Date(order.createdAt).toLocaleString("en-PK", {
     month: "short", day: "numeric",
@@ -57,6 +59,14 @@ function OrderRow({ order, onStatusChange, updating }) {
         </span>
       </td>
       <td className="px-4 py-3 text-xs text-gray-400">{dateStr}</td>
+      <td className="px-4 py-3">
+        <button
+          onClick={() => onChatOpen(order)}
+          className="bg-red-50 hover:bg-red-100 text-red-600 font-semibold px-2.5 py-1.5 rounded-lg border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+        >
+          💬 Chat
+        </button>
+      </td>
       <td className="px-4 py-3">
         <select
           disabled={updating === order._id}
@@ -207,6 +217,153 @@ function PizzaModal({ isOpen, onClose, pizza, onSave }) {
   );
 }
 
+/* ─── Chat Drawer ────────────────────────────────────────────────── */
+function ChatDrawer({ order, onClose }) {
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const socketRef = useRef(null);
+  const chatEndRef = useRef(null);
+
+  // Load chat history on open
+  useEffect(() => {
+    if (order?._id) {
+      const history = localStorage.getItem(`chat_history_${order._id}`);
+      if (history) {
+        setMessages(JSON.parse(history));
+      } else {
+        // Default restaurant greeting
+        const welcomeMsg = {
+          sender: "restaurant",
+          text: `Hi ${order.customerName}! We have received your order. Let us know if you need any adjustments or updates.`,
+          createdAt: new Date().toISOString()
+        };
+        setMessages([welcomeMsg]);
+        localStorage.setItem(`chat_history_${order._id}`, JSON.stringify([welcomeMsg]));
+      }
+    }
+  }, [order?._id]);
+
+  // Set up socket connection
+  useEffect(() => {
+    if (!order?._id) return;
+
+    const socket = io();
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      setIsConnected(true);
+      socket.emit("join_room", order._id);
+    });
+
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    socket.on("receive_message", (message) => {
+      setMessages((prev) => {
+        const updated = [...prev, message];
+        localStorage.setItem(`chat_history_${order._id}`, JSON.stringify(updated));
+        return updated;
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [order?._id]);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!inputText.trim() || !socketRef.current || !order?._id) return;
+
+    const messageData = {
+      orderId: order._id,
+      sender: "restaurant",
+      text: inputText.trim()
+    };
+
+    socketRef.current.emit("send_message", messageData);
+    setInputText("");
+  };
+
+  if (!order) return null;
+
+  return (
+    <div className="fixed inset-y-0 right-0 z-50 w-96 bg-white shadow-2xl border-l border-gray-100 flex flex-col transform translate-x-0 transition-transform duration-300 ease-in-out font-sans">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-red-600 to-orange-500 p-4 text-white flex justify-between items-center shrink-0">
+        <div>
+          <h3 className="font-bold text-sm leading-tight text-white">Chat with {order.customerName}</h3>
+          <p className="text-[10px] opacity-80 flex items-center gap-1 text-white">
+            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-green-400" : "bg-red-400"}`} />
+            {isConnected ? "Connected to Customer" : "Connecting..."}
+          </p>
+        </div>
+        <button onClick={onClose} className="text-white hover:text-gray-200 p-1 bg-transparent border-none cursor-pointer">
+          <IoClose size={20} />
+        </button>
+      </div>
+
+      {/* Info bar */}
+      <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-100 text-xs text-gray-500 shrink-0">
+        <p className="font-semibold text-gray-700">Order #{order._id.slice(-6).toUpperCase()}</p>
+        <p className="mt-0.5 text-gray-500">Phone: {order.phoneNumber}</p>
+        <p className="truncate mt-0.5 text-gray-500">Address: {order.address}</p>
+      </div>
+
+      {/* Message history */}
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50 space-y-3 flex flex-col">
+        {messages.map((msg, idx) => {
+          const isRestaurant = msg.sender === "restaurant";
+          return (
+            <div
+              key={idx}
+              className={`flex flex-col max-w-[80%] ${isRestaurant ? "self-end items-end" : "self-start items-start"}`}
+            >
+              <div className={`rounded-2xl px-4 py-2 text-sm ${
+                isRestaurant
+                  ? "bg-red-600 text-white rounded-br-none"
+                  : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
+              }`}>
+                <p className="break-words">{msg.text}</p>
+              </div>
+              <span className="text-[9px] text-gray-400 mt-1 px-1">
+                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          );
+        })}
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* Input Form */}
+      <form onSubmit={handleSend} className="p-3 border-t border-gray-100 bg-white flex gap-2 shrink-0">
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder="Type your response..."
+          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 text-black placeholder-gray-400 bg-white"
+        />
+        <button
+          type="submit"
+          disabled={!inputText.trim()}
+          className="bg-red-600 text-white p-2 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-40 shrink-0 cursor-pointer"
+        >
+          <IoSend size={18} />
+        </button>
+      </form>
+    </div>
+  );
+}
+
 /* ─── Sidebar Nav Item ───────────────────────────────────────────── */
 function NavItem({ icon, label, active, onClick, badge }) {
   return (
@@ -244,6 +401,17 @@ export default function RestaurantDashboard() {
   const [search, setSearch]       = useState("");
   const [lastRefresh, setLastRefresh] = useState(null);
   const [activeSection, setActiveSection] = useState("orders"); // "orders" | "analytics" | "pizzas"
+  const [activeChatOrder, setActiveChatOrder] = useState(null);
+  const socketRef = useRef(null);
+
+  // Initialize Socket.io connection for dashboard notifications
+  useEffect(() => {
+    const socket = io();
+    socketRef.current = socket;
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Menu State
   const [menuItems, setMenuItems] = useState([]);
@@ -301,6 +469,11 @@ export default function RestaurantDashboard() {
       setOrders((prev) =>
         prev.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
       );
+      
+      // Notify active customer chat session that status changed
+      if (socketRef.current) {
+        socketRef.current.emit("status_change", { orderId, status: newStatus });
+      }
     } catch {
       alert("Failed to update status. Try again.");
     } finally {
@@ -389,6 +562,12 @@ export default function RestaurantDashboard() {
         pizza={editingPizza}
         onClose={() => { setShowPizzaModal(false); setEditingPizza(null); }}
         onSave={handleSavePizza}
+      />
+
+      {/* Chat Drawer */}
+      <ChatDrawer
+        order={activeChatOrder}
+        onClose={() => setActiveChatOrder(null)}
       />
 
       {/* Content wrapper */}
@@ -561,7 +740,7 @@ export default function RestaurantDashboard() {
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
                         <tr>
-                          {["ID", "Customer", "Address", "Items", "Total", "Status", "Time", "Update"].map((h) => (
+                          {["ID", "Customer", "Address", "Items", "Total", "Status", "Time", "Chat", "Update"].map((h) => (
                             <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
                           ))}
                         </tr>
@@ -573,6 +752,7 @@ export default function RestaurantDashboard() {
                             order={order}
                             onStatusChange={handleStatusChange}
                             updating={updating}
+                            onChatOpen={(o) => setActiveChatOrder(o)}
                           />
                         ))}
                       </tbody>

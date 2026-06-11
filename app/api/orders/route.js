@@ -45,11 +45,30 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const orderId = searchParams.get("orderId");
+
     const client = await clientPromise;
     const db = client.db("pizzalogist");
     const collection = db.collection("orders");
+
+    if (orderId) {
+      if (!ObjectId.isValid(orderId)) {
+        return Response.json({ error: "Invalid order ID format" }, { status: 400 });
+      }
+      const order = await collection.findOne({ _id: new ObjectId(orderId) });
+      if (!order) {
+        return Response.json({ error: "Order not found" }, { status: 404 });
+      }
+      return Response.json({
+        order: {
+          ...order,
+          _id: order._id.toString()
+        }
+      }, { status: 200 });
+    }
 
     const orders = await collection
       .find({})

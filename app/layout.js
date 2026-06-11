@@ -5,8 +5,7 @@ import SessionWrapper from "@/app/component/SessionWrapper";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import CartPopup from "@/components/CartPopup";
-
-
+import ChatBubble from "@/components/ChatBubble";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +26,7 @@ export default function RootLayout({ children }) {
           <CartProvider>
             <Navbar />
             <CartPopup />
+            <ChatBubble />
             <div >
               {children}
               <script src="https://cdn.lordicon.com/lordicon.js"></script>

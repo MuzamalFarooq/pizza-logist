@@ -66,6 +66,16 @@ export default function CartPopup() {
                     transition: Bounce,
                 });
 
+                // Save active order details to localStorage for chat
+                if (data.orderId) {
+                    localStorage.setItem("pizza_logist_active_order", JSON.stringify({
+                        orderId: data.orderId,
+                        customerName: customerName.trim(),
+                        phoneNumber: phoneNumber.trim()
+                    }));
+                    window.dispatchEvent(new Event("activeOrderChanged"));
+                }
+
                 // Reset form
                 setCustomerName("");
                 setPhoneNumber("");
