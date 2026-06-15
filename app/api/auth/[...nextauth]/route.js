@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 export const authOptions = {
   providers: [
@@ -7,7 +8,43 @@ export const authOptions = {
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET
     }),
+    CredentialsProvider({
+      name: "Admin Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        const adminEmail = process.env.ADMIN_EMAIL || "admin@pizzalogist.com";
+        const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+        if (
+          credentials?.email === adminEmail &&
+          credentials?.password === adminPassword
+        ) {
+          return { id: "admin-id", name: "Admin", email: adminEmail, role: "admin" };
+        }
+        return null;
+      }
+    }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.role = token.role;
+      }
+      return session;
+    }
+  },
+  pages: {
+    signIn: '/admin/login',
+  },
   secret: process.env.NEXTAUTH_SECRET,
 }
 

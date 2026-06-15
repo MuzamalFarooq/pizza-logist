@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import PizzaLogisticsLoading from "@/components/PizzaLogisticsLoading";
 import { io } from "socket.io-client";
 import { IoClose, IoSend } from "react-icons/io5";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const STATUS_COLORS = {
   pending:           { bg: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-400", ring: "ring-yellow-300" },
@@ -393,6 +395,16 @@ function NavItem({ icon, label, active, onClick, badge }) {
 
 /* ─── Main Dashboard ─────────────────────────────────────────────── */
 export default function RestaurantDashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Redirect if not logged in or not an admin
+  useEffect(() => {
+    if (status === "unauthenticated" || (session && session.user?.role !== "admin")) {
+      router.push("/admin/login");
+    }
+  }, [status, session, router]);
+
   const [orders, setOrders]       = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
@@ -549,6 +561,10 @@ export default function RestaurantDashboard() {
   );
 
   /* ── Render ── */
+  if (status === "loading" || !session || session.user?.role !== "admin") {
+    return <PizzaLogisticsLoading />;
+  }
+
   if (loading) {
     return <PizzaLogisticsLoading />;
   }

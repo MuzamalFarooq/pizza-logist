@@ -1,5 +1,7 @@
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(request) {
   try {
@@ -70,6 +72,12 @@ export async function GET(request) {
       }, { status: 200 });
     }
 
+    // Require admin session to fetch all orders
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const orders = await collection
       .find({})
       .sort({ createdAt: -1 })
@@ -90,6 +98,11 @@ export async function GET(request) {
 
 export async function PUT(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { orderId, status } = body;
 

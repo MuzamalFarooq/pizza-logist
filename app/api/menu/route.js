@@ -1,5 +1,7 @@
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const DB = "pizzalogist";
 const COL = "menu";
@@ -61,6 +63,11 @@ export const config = {
 /* ── POST: create a new menu item ── */
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { name, price, category, description, image } = await request.json();
     if (!name || !price || !category) {
       return Response.json({ error: "name, price and category are required." }, { status: 400 });
@@ -85,6 +92,11 @@ export async function POST(request) {
 /* ── PUT: update an existing menu item ── */
 export async function PUT(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id, name, price, category, description, image } = await request.json();
     if (!id || !name || !price || !category) {
       return Response.json({ error: "id, name, price and category are required." }, { status: 400 });
@@ -120,6 +132,11 @@ export async function PUT(request) {
 /* ── DELETE: remove a menu item by id ── */
 export async function DELETE(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await request.json();
     if (!id) return Response.json({ error: "id is required." }, { status: 400 });
     const client = await clientPromise;

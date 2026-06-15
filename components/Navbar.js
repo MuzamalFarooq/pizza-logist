@@ -196,9 +196,11 @@ const Navbar = () => {
                     <Link href="/Contact">
                         <button className='hover:text-red-500 text-white px-2 py-1 text-xs lg:text-sm font-extrabold transition-colors'>Contact</button>
                     </Link>
-                    <Link href="/Dashboard">
-                        <button className='hover:text-red-500 text-white px-2 py-1 text-xs lg:text-sm font-extrabold transition-colors'>Dashboard</button>
-                    </Link>
+                    {session?.user?.role === "admin" && (
+                        <Link href="/Dashboard">
+                            <button className='hover:text-red-500 text-white px-2 py-1 text-xs lg:text-sm font-extrabold transition-colors'>Dashboard</button>
+                        </Link>
+                    )}
                 </div>
 
                 {/* Auth Section - Desktop */}
@@ -266,9 +268,11 @@ const Navbar = () => {
                         <Link href="/Contact">
                             <button onClick={() => setShowMobileMenu(false)} className='hover:bg-red-700 text-white w-full text-left px-4 py-2 rounded text-sm font-semibold transition-colors'>Contact</button>
                         </Link>
-                        <Link href="/Dashboard">
-                            <button onClick={() => setShowMobileMenu(false)} className='hover:bg-red-700 text-white w-full text-left px-4 py-2 rounded text-sm font-semibold transition-colors'>Dashboard</button>
-                        </Link>
+                        {session?.user?.role === "admin" && (
+                            <Link href="/Dashboard">
+                                <button onClick={() => setShowMobileMenu(false)} className='hover:bg-red-700 text-white w-full text-left px-4 py-2 rounded text-sm font-semibold transition-colors'>Dashboard</button>
+                            </Link>
+                        )}
                         
                         <div className='border-t border-red-500 my-2'></div>
                         
