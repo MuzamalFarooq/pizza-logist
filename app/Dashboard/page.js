@@ -300,7 +300,7 @@ function ChatDrawer({ order, onClose }) {
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-96 bg-white shadow-2xl border-l border-gray-100 flex flex-col transform translate-x-0 transition-transform duration-300 ease-in-out font-sans">
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-600 to-orange-500 p-4 text-white flex justify-between items-center shrink-0">
+      <div className="bg-linear-to-r from-red-600 to-orange-500 p-4 text-white flex justify-between items-center shrink-0">
         <div>
           <h3 className="font-bold text-sm leading-tight text-white">Chat with {order.customerName}</h3>
           <p className="text-[10px] opacity-80 flex items-center gap-1 text-white">
@@ -334,7 +334,7 @@ function ChatDrawer({ order, onClose }) {
                   ? "bg-red-600 text-white rounded-br-none"
                   : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
               }`}>
-                <p className="break-words">{msg.text}</p>
+                <p className="wrap-break-words">{msg.text}</p>
               </div>
               <span className="text-[9px] text-gray-400 mt-1 px-1">
                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

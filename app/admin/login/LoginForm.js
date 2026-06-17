@@ -46,14 +46,14 @@ export default function LoginForm() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-orange-600/15 blur-[120px] pointer-events-none" />
 
       {/* Login Card */}
-      <div className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 w-full max-w-md shadow-2xl relative z-10 hover:border-red-500/20 transition-all duration-500">
+      <div className="bg-white/2 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-10 w-full max-w-md shadow-2xl relative z-10 hover:border-red-500/20 transition-all duration-500">
         
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-yellow-400 to-red-600 shadow-xl shadow-red-600/20 mb-4 animate-[pulse_3s_infinite] rotate-3 hover:rotate-12 transition-transform duration-300">
             <span className="text-3xl">🍕</span>
           </div>
-          <h1 className="text-2xl font-black tracking-wider uppercase bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-100 to-amber-200">
+          <h1 className="text-2xl font-black tracking-wider uppercase bg-clip-text text-transparent bg-linear-to-r from-white via-orange-100 to-amber-200">
             Pizza Logist
           </h1>
           <p className="text-xs text-orange-400 font-semibold uppercase tracking-widest mt-1">
@@ -91,7 +91,7 @@ export default function LoginForm() {
           {!showAdminForm ? (
             <button
               onClick={() => setShowAdminForm(true)}
-              className="w-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-bold py-3.5 px-4 rounded-xl text-sm hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer text-center flex items-center justify-center gap-2"
+              className="w-full bg-white/3 hover:bg-white/6 border border-white/10 text-white font-bold py-3.5 px-4 rounded-xl text-sm hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer text-center flex items-center justify-center gap-2"
             >
               <span>🛡️</span> Login as Administrator
             </button>
@@ -120,7 +120,7 @@ export default function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@pizzalogist.com"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/40 transition-all duration-200 placeholder-gray-600"
+                    className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/40 transition-all duration-200 placeholder-gray-600"
                   />
                 </div>
 
@@ -136,7 +136,7 @@ export default function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/40 transition-all duration-200 placeholder-gray-600"
+                    className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/40 transition-all duration-200 placeholder-gray-600"
                   />
                 </div>
 
@@ -145,7 +145,7 @@ export default function LoginForm() {
                   id="admin-login-submit"
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-red-600/20 hover:shadow-red-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-linear-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-red-600/20 hover:shadow-red-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>

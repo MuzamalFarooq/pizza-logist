@@ -12,7 +12,7 @@
 
 ## 🚀 Key Features
 
-- 🍕 **Dynamic Menu Exploration**: Browse through categorized deals including *Best Deals*, *Explore Deals*, *Best Sellers*, and *Discount Deals*.
+- 🍕 **Dynamic Menu Exploration**: Browse through categorized deals including _Best Deals_, _Explore Deals_, _Best Sellers_, and _Discount Deals_.
 - 🛒 **Persistent Shopping Cart**: A smooth, slide-in cart experience powered by React Context that keeps track of your items across sessions.
 - 🔐 **GitHub Social Authentication**: Secure, one-click login using **NextAuth.js** and GitHub OAuth.
 - 📦 **Order Management**: Robust API system for placing and processing pizza orders.
@@ -38,6 +38,7 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
 ## 🛠️ Tech Stack
 
 ### Core Technologies
+
 - **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
 - **Library**: [React 19](https://react.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & Vanilla CSS
@@ -45,6 +46,7 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)
 
 ### Key Dependencies
+
 - `react-toastify`: Elegant notification system.
 - `mongodb`: Database connectivity and ODM.
 - `next-auth`: Secure session and OAuth management.
@@ -55,6 +57,7 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
 ## 🏗️ Getting Started
 
 ### Prerequisites
+
 - Node.js (Latest version recommended)
 - MongoDB Atlas account or local MongoDB instance
 - GitHub Developer account (for OAuth setup)
@@ -62,18 +65,21 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
-   git clone https://github.com/yourusername/pizza-logist.git
+   git clone https://github.com/MuzamalFarooq/pizza-logist.git
    cd pizza-logist
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up Environment Variables:**
    Create a `.env.local` file in the root directory:
+
    ```env
    # Database
    MONGODB_URI=your_mongodb_connection_string
@@ -88,6 +94,7 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
    ```
 
 4. **GitHub OAuth Setup:**
+
    - Go to [GitHub Settings > Developer Settings > OAuth Apps](https://github.com/settings/developers).
    - Create a "New OAuth App".
    - Set **Homepage URL** to `http://localhost:3000`.
@@ -123,14 +130,12 @@ Pizza-Logist implements a secure authentication layer using **NextAuth.js**, pro
 ## 👨‍💻 Developer
 
 **Muzamal Farooq**  
-*Full Stack Developer*
+_Full Stack Developer_
 
 Passionate about building scalable, high-performance web applications with a focus on user experience and modern design.
 
 ---
+
 **Email** [muzamalfarooq111@gmail.com]
-**Contact** [+92 3061704327]
+**Contact** [+92 3067774327]
 **LinkdIn** [https://www.linkedin.com/in/muzamal-farooq-1232693/]
-
-
-

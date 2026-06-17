@@ -169,9 +169,9 @@ export default function ChatBubble() {
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
             {/* Chat Window */}
             {isOpen && (
-                <div className="mb-4 w-80 sm:w-96 h-[450px] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+                <div className="mb-4 w-80 sm:w-96 h-112.5 bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-red-600 to-orange-500 p-4 text-white flex justify-between items-center shrink-0">
+                    <div className="bg-linear-to-r from-red-600 to-orange-500 p-4 text-white flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-lg">
                                 🍕
@@ -218,7 +218,7 @@ export default function ChatBubble() {
                                             ? "bg-red-600 text-white rounded-br-none" 
                                             : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
                                     }`}>
-                                        <p className="break-words">{msg.text}</p>
+                                        <p className="wrap-break-words">{msg.text}</p>
                                     </div>
                                     <span className="text-[9px] text-gray-400 mt-1 px-1">
                                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -253,7 +253,7 @@ export default function ChatBubble() {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="w-14 h-14 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 relative group animate-bounce cursor-pointer border-none"
+                    className="w-14 h-14 bg-linear-to-r from-red-600 to-orange-500 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 relative group animate-bounce cursor-pointer border-none"
                     style={{ animationDuration: '3s' }}
                 >
                     <IoChatbubbleEllipses size={26} />
