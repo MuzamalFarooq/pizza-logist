@@ -11,7 +11,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showAdminForm, setShowAdminForm] = useState(false);
+  const [showAdminForm, setShowAdminForm] = useState(true);
   const router = useRouter();
 
   const handleSubmit = async (e) => {

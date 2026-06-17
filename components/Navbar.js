@@ -177,7 +177,7 @@ const Navbar = () => {
                 {/* Cart */}
                 <div className="shoping cart text-white">
                     <button onClick={toggleCart} type="button" className="relative flex items-center justify-center rounded-full bg-white/80 p-2">
-                        <img className="h-6 w-6 object-contain" src="shopping-cart.png" alt="cart"></img>
+                        <img className="h-6 w-6 object-contain" src="/shopping-cart.png" alt="cart"></img>
                         <span className="absolute -right-2 -top-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">{cart.length}</span>
                     </button>
                 </div>

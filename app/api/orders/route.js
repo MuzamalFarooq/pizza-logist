@@ -16,7 +16,7 @@ export async function POST(request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("pizzalogist");
+    const db = client.db(process.env.MONGODB_DB_NAME || "PizzaLogistics");
     const collection = db.collection("orders");
 
     const order = {
@@ -53,7 +53,7 @@ export async function GET(request) {
     const orderId = searchParams.get("orderId");
 
     const client = await clientPromise;
-    const db = client.db("pizzalogist");
+    const db = client.db(process.env.MONGODB_DB_NAME || "PizzaLogistics");
     const collection = db.collection("orders");
 
     if (orderId) {
@@ -112,7 +112,7 @@ export async function PUT(request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("pizzalogist");
+    const db = client.db(process.env.MONGODB_DB_NAME || "PizzaLogistics");
     const collection = db.collection("orders");
 
     await collection.updateOne(

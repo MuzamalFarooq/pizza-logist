@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-const DB = "pizzalogist";
+const DB = process.env.MONGODB_DB_NAME || "PizzaLogistics";
 const COL = "menu";
 
 /* ── Seed helper: copy static data if collection is empty ── */

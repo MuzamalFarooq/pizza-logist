@@ -15,7 +15,7 @@ export async function POST(request) {
     }
 
     const client = await clientPromise;
-    const db = client.db("pizzalogist");
+    const db = client.db(process.env.MONGODB_DB_NAME || "PizzaLogistics");
     const collection = db.collection("pizza customers");
 
     const message = {

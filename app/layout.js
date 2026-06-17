@@ -16,26 +16,22 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
-
   return (
     <html lang="en">
-
-      <SessionWrapper>
-        <body className=" bg-white">
+      <body className={`${inter.className} bg-white`}>
+        <SessionWrapper>
           <CartProvider>
             <Navbar />
             <CartPopup />
             <ChatBubble />
-            <div >
+            <div>
               {children}
               <script src="https://cdn.lordicon.com/lordicon.js"></script>
               <Footer />
             </div>
           </CartProvider>
-        </body>
-      </SessionWrapper>
-
-    </html >
+        </SessionWrapper>
+      </body>
+    </html>
   );
 }

@@ -126,7 +126,7 @@ export default function CartPopup() {
 
                 {cart.length === 0 ? (
                     <div className="text-center py-6">
-                        <img className="w-24 sm:w-32 md:w-40 mx-auto mb-4" src="pizza box.svg" alt="Empty Cart" />
+                        <img className="w-24 sm:w-32 md:w-40 mx-auto mb-4" src="/pizza box.svg" alt="Empty Cart" />
                         <span className="font-bold text-sm sm:text-lg md:text-xl text-center block">"Oops! Your cart is empty. 😞 Hungry yet? Choose from our mouthwatering pizzas and start filling up your cart!"</span>
                     </div>
                 ) : (

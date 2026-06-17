@@ -10,7 +10,8 @@ export async function GET() {
     console.log("✅ MongoDB connection successful!");
     
     // Check if menu collection exists
-    const db = client.db("pizzalogist");
+    const dbName = process.env.MONGODB_DB_NAME || "PizzaLogistics";
+    const db = client.db(dbName);
     const collections = await db.listCollections().toArray();
     const hasMenuCollection = collections.some(c => c.name === "menu");
     
@@ -24,7 +25,7 @@ export async function GET() {
       JSON.stringify({
         status: "✅ OK",
         mongodb: "Connected",
-        database: "pizzalogist",
+        database: process.env.MONGODB_DB_NAME || "PizzaLogistics",
         hasMenuCollection: hasMenuCollection,
         menuItemsCount: menuCount,
         timestamp: new Date().toISOString(),
