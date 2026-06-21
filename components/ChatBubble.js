@@ -7,9 +7,6 @@ import { useSession } from "next-auth/react";
 export default function ChatBubble() {
     const { data: session } = useSession();
     const [activeOrder, setActiveOrder] = useState(null);
-
-    // Hide chat bubble if logged in as admin
-    if (session?.user?.role === "admin") return null;
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState("");
@@ -53,6 +50,7 @@ export default function ChatBubble() {
 
         const handleOrderChange = () => {
             loadActiveOrder();
+            setIsOpen(true); // Automatically expand the chat bubble when a new order is placed
         };
 
         window.addEventListener("activeOrderChanged", handleOrderChange);
@@ -162,6 +160,9 @@ export default function ChatBubble() {
             setMessages([]);
         }
     };
+
+    // Hide chat bubble if logged in as admin
+    if (session?.user?.role === "admin") return null;
 
     if (!activeOrder) return null;
 

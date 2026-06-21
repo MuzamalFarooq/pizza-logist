@@ -5,7 +5,7 @@ import { toast, ToastContainer, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function CartPopup() {
-    const { cart, isOpen, toggleCart, removeFromCart } = useCart();
+    const { cart, isOpen, toggleCart, removeFromCart, clearCart } = useCart();
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [customerName, setCustomerName] = useState("");
@@ -81,6 +81,8 @@ export default function CartPopup() {
                 setPhoneNumber("");
                 setAddress("");
                 setShowForm(false);
+                clearCart();
+                toggleCart(); // Close the cart modal
             } else {
                 toast.error(data.error || 'Failed to place order!', {
                     position: "top-right",
