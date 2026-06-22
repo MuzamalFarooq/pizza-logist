@@ -105,9 +105,9 @@ export default function Home() {
           </div>
         </div>
         {/* list of categories buttons  bellow our signature pizza  */}
-        <div className="flex flex-row flex-wrap p-2 sm:p-3 m-1 sm:m-3 justify-center w-full gap-1 sm:gap-2 bg-white ">
+        <div className="flex flex-row flex-nowrap sm:flex-wrap overflow-x-auto no-scrollbar justify-start sm:justify-center w-full gap-2 bg-white p-2 sm:p-3 my-1 sm:my-3">
           {categoryOrder.map(card => (
-            <a key={card.id} className="buttoner border border-black rounded-lg sm:rounded-xl bg-red-500 hover:bg-gray-200 hover:scale-105 sm:hover:scale-110 duration-300 px-2 sm:px-3 py-1 sm:py-1.5 m-0.5 sm:m-1 text-xs sm:text-sm md:text-base text-black font-semibold transition-colors" href={`#${card.id}`}>
+            <a key={card.id} className="buttoner border border-black rounded-lg sm:rounded-xl bg-red-500 hover:bg-gray-200 hover:scale-105 sm:hover:scale-110 duration-300 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base text-black font-semibold transition-colors shrink-0 whitespace-nowrap" href={`#${card.id}`}>
               {card.title}
             </a>
           ))}
