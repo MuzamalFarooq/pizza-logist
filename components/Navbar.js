@@ -95,9 +95,11 @@ const Navbar = () => {
 
                 {/* Animated Logo */}
                 <Link href="/" className="flex items-center gap-1 sm:gap-2 group cursor-pointer">
-                    <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-linear-to-br from-yellow-400 to-red-600 shadow-lg group-hover:shadow-red-500/50 transition-all duration-300 transform group-hover:rotate-12 group-hover:scale-110 shrink-0">
-                        <span className="text-lg sm:text-xl animate-[spin_6s_linear_infinite] inline-block origin-center">🍕</span>
-                    </div>
+                    <img 
+                        src="/logo.png" 
+                        alt="Pizza Logist Logo" 
+                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-all duration-300 transform group-hover:scale-110 shrink-0" 
+                    />
                     <div className=" flex-col hidden sm:flex">
                         <span className="text-white font-black text-sm sm:text-lg tracking-wider uppercase leading-none" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}>Pizza</span>
                         <span className="text-yellow-400 font-extrabold text-[9px] sm:text-[11px] tracking-widest uppercase leading-none mt-0.5" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.6)' }}>Logist</span>
