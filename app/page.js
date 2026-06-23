@@ -166,10 +166,10 @@ export default function Home() {
                         <div className="flex flex-col items-center gap-1 sm:gap-2 p-2 sm:p-4 text-center flex-1 bg-white">
                           <h1 className="w-full font-bold text-sm sm:text-base md:text-lg leading-tight text-black line-clamp-2">{item.name}</h1>
                           <span className='font-semibold text-xs sm:text-sm md:text-base text-black'>PKR {item.price?.toLocaleString()}</span>
-                          <p className="text-black text-xs sm:text-sm leading-snug line-clamp-3 overflow-hidden flex-1 w-full">{item.description}</p>
+                          <p className="text-black text-xs sm:text-sm leading-snug line-clamp-3 overflow-hidden w-full">{item.description}</p>
 
                           <button onClick={() => handleAddToCart(item.name, item.price)}
-                            className="add-to-cart w-full mt-1 sm:mt-2 font-bold text-sm sm:text-base md:text-lg bg-[rgb(199,16,46)] hover:bg-red-700 text-white py-1.5 sm:py-2 transition duration-105 ease-in-out rounded-lg shadow-md">
+                            className="add-to-cart w-full mt-auto font-bold text-sm sm:text-base md:text-lg bg-[rgb(199,16,46)] hover:bg-red-700 text-white py-1.5 sm:py-2 transition duration-105 ease-in-out rounded-lg shadow-md">
                             Add to Cart
                           </button>
                         </div>
