@@ -6,6 +6,21 @@ import { IoClose, IoSend } from "react-icons/io5";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 const STATUS_COLORS = {
   pending:           { bg: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-400", ring: "ring-yellow-300" },
   preparing:         { bg: "bg-blue-100",   text: "text-blue-700",   dot: "bg-blue-400",   ring: "ring-blue-300"   },
@@ -398,6 +413,88 @@ export default function RestaurantDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  // Push Notification States
+  const [pushSupported, setPushSupported] = useState(false);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+  const [permissionState, setPermissionState] = useState("default");
+
+  const syncSubscriptionWithServer = async (subscription) => {
+    try {
+      await fetch("/api/notifications/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+    } catch (err) {
+      console.error("Error syncing subscription with server:", err);
+    }
+  };
+
+  const checkActiveSubscription = useCallback(async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      setPushSubscribed(!!subscription);
+      if (subscription) {
+        await syncSubscriptionWithServer(subscription);
+      }
+    } catch (err) {
+      console.error("Error checking active subscription:", err);
+    }
+  }, []);
+
+  const subscribeToPush = async () => {
+    if (!pushSupported) return;
+    setPushLoading(true);
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      const permission = await Notification.requestPermission();
+      setPermissionState(permission);
+
+      if (permission !== "granted") {
+        throw new Error("Notification permission not granted");
+      }
+
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidKey) {
+        throw new Error("VAPID public key is missing in environment");
+      }
+      const applicationServerKey = urlBase64ToUint8Array(vapidKey);
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey,
+      });
+
+      await syncSubscriptionWithServer(subscription);
+      setPushSubscribed(true);
+    } catch (err) {
+      console.error("Push subscription failed:", err);
+      alert("Push subscription failed: " + err.message);
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
+  // Check notification support and status
+  useEffect(() => {
+    if (status === "authenticated" && typeof window !== "undefined") {
+      const isSupported = "serviceWorker" in navigator && "PushManager" in window;
+      setPushSupported(isSupported);
+
+      if (isSupported) {
+        setPermissionState(Notification.permission);
+        if (Notification.permission === "granted") {
+          navigator.serviceWorker.register("/sw.js").then(() => {
+            checkActiveSubscription();
+          }).catch((err) => {
+            console.error("SW registration failed on check:", err);
+          });
+        }
+      }
+    }
+  }, [status, checkActiveSubscription]);
+
   // Redirect if not logged in or not an admin
   useEffect(() => {
     if (status === "unauthenticated" || (session && session.user?.role !== "admin")) {
@@ -665,6 +762,36 @@ export default function RestaurantDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {pushSupported && (
+              <button
+                onClick={subscribeToPush}
+                disabled={pushLoading || (permissionState === "granted" && pushSubscribed)}
+                className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+                  permissionState === "denied"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
+                    : permissionState === "granted" && pushSubscribed
+                    ? "bg-green-50 text-green-700 border border-green-200 hover:scale-[1.02]"
+                    : "bg-red-50 text-red-600 border border-red-200 animate-pulse hover:bg-red-100"
+                }`}
+                title={
+                  permissionState === "denied"
+                    ? "Notifications are blocked. Please enable them in browser settings."
+                    : permissionState === "granted" && pushSubscribed
+                    ? "Push notifications are active on this device"
+                    : "Click to enable push notifications on this device"
+                }
+              >
+                <span>
+                  {permissionState === "denied"
+                    ? "🔕 Blocked"
+                    : permissionState === "granted" && pushSubscribed
+                    ? "🔔 Active"
+                    : pushLoading
+                    ? "⏳ Connecting..."
+                    : "🔔 Enable Alerts"}
+                </span>
+              </button>
+            )}
             <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${
               pendingCount > 0 ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"
             }`}>

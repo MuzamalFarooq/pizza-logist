@@ -2,6 +2,15 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import webpush from "web-push";
+
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || "mailto:admin@pizzalogist.com",
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 export async function POST(request) {
   try {
@@ -33,6 +42,34 @@ export async function POST(request) {
     };
 
     const result = await collection.insertOne(order);
+
+    // Trigger push notification to admins
+    try {
+      const subscriptions = await db.collection("push_subscriptions").find({ role: "admin" }).toArray();
+      if (subscriptions.length > 0) {
+        const payload = JSON.stringify({
+          title: "New Pizza Order! 🍕",
+          body: `${customerName} placed an order for PKR ${totalPrice.toLocaleString()}`,
+          url: "/Dashboard",
+        });
+
+        const notifications = subscriptions.map((subDoc) => {
+          return webpush.sendNotification(subDoc.subscription, payload)
+            .catch(async (err) => {
+              if (err.statusCode === 404 || err.statusCode === 410) {
+                console.log(`Pruning expired subscription: ${subDoc.endpoint}`);
+                await db.collection("push_subscriptions").deleteOne({ _id: subDoc._id });
+              } else {
+                console.error("Web Push sending error:", err);
+              }
+            });
+        });
+
+        await Promise.all(notifications);
+      }
+    } catch (pushError) {
+      console.error("Failed to process push notifications:", pushError);
+    }
 
     return Response.json(
       { message: "Order placed successfully!", orderId: result.insertedId },
