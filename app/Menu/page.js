@@ -1,320 +1,194 @@
 "use client"
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCart } from '@/context/CartContext';
+import PizzaLogisticsLoading from '@/components/PizzaLogisticsLoading';
 
 const Menu = () => {
-
     const { addToCart } = useCart();
+    const [menuItems, setMenuItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const handleAddToCart = (name, price) => {
         const item = { id: Date.now(), name, price };
         addToCart(item);
     };
 
+    const scrollLeft = (id) => {
+        const el = document.getElementById(id);
+        if (el) el.scrollBy({ left: -320, behavior: 'smooth' });
+    };
+
+    const scrollRight = (id) => {
+        const el = document.getElementById(id);
+        if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        const fetchMenu = async () => {
+            try {
+                console.log("Fetching menu from /api/menu...");
+                const res = await fetch("/api/menu", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    setMenuItems(data.items || []);
+                    setError(null);
+                } else {
+                    const errorData = await res.json();
+                    setError(errorData.error || "Failed to fetch menu");
+                }
+            } catch (err) {
+                console.error("Error fetching menu:", err);
+                setError(err.message || "Connection error. Make sure MongoDB is running.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMenu();
+    }, []);
+
+    const categoryOrder = [
+        { id: "bestdeals", title: "Best Deals", key: "Best Deals" },
+        { id: "Exploredeals", title: "Explore Deals", key: "Explore Deals" },
+        { id: "jazzdeals", title: "Jazz Deals", key: "Jazz Deals" },
+        { id: "midnightdeals", title: "Midnight Deals", key: "Midnight Deals" },
+        { id: "bestseller", title: "Best Seller", key: "Best Seller" },
+        { id: "discountdeals", title: "Appetizers", key: "Appetizers" },
+        { id: "drinks", title: "Drinks", key: "Drinks" },
+        { id: "dips", title: "Dips", key: "Dips" }
+    ];
+
+    const getDefaultImage = (itemName, category) => {
+        const name = itemName.toLowerCase();
+        if (name.includes("pepperoni")) return "/Deal 2 image.webp";
+        if (name.includes("fagita") || name.includes("fajita")) return "/Chicken Fagita.webp";
+        if (name.includes("ranch")) return "/Spicy Chicken Ranch.webp";
+        if (name.includes("veggie")) return "/very veggie.webp";
+        if (name.includes("ramdan")) return "/ramdan deal 1.webp";
+        if (name.includes("jazz")) return "/jazz deal.webp";
+        if (name.includes("midnight")) return "/midnight deal.webp";
+        if (name.includes("hut")) return "/hut deal.webp";
+        if (name.includes("appetizer")) return "/appetizer platter.webp";
+        if (name.includes("spin roll") || name.includes("spin rool")) return "/bihari chicken spin rool.webp";
+        if (name.includes("wings")) return "/wings.webp";
+        if (name.includes("wedges")) return "/patato wedges.webp";
+        if (name.includes("aquafina") || name.includes("water")) return "/water bottel.webp";
+        if (name.includes("pepsi")) return "/pepsi bottle.webp";
+        if (name.includes("7 up") || name.includes("7up")) return "/7up bottle.webp";
+        if (name.includes("mirinda") || name.includes("marinda")) return "/Mirinda bottle.webp";
+        
+        switch (category) {
+            case "Best Deals": return "/Deal 2 image.webp";
+            case "Explore Deals": return "/hut deal.webp";
+            case "Jazz Deals": return "/jazz deal.webp";
+            case "Midnight Deals": return "/midnight deal.webp";
+            case "Best Seller": return "/Chicken Fagita.webp";
+            case "Appetizers": return "/appetizer platter.webp";
+            case "Drinks": return "/pepsi bottle.webp";
+            case "Dips": return "/deal 2 image.webp";
+            default: return "/Deal 2 image.webp";
+        }
+    };
+
+    if (loading) {
+        return <PizzaLogisticsLoading />;
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center py-20 bg-gray-50 min-h-screen">
+                <div className="max-w-md w-full bg-white border border-red-200 p-6 rounded-xl shadow-md">
+                    <h3 className="text-red-700 font-bold text-lg mb-2 flex items-center gap-2">
+                        <span>⚠️</span> Error Loading Menu
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition duration-150"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div className="bg-white py-6 sm:py-8 min-h-screen p-2 sm:p-4 md:p-6">
+            <div className="max-w-7xl mx-auto">
+                {categoryOrder.map(card => {
+                    const items = menuItems.filter(item => item.category === card.key);
+                    if (items.length === 0) return null;
 
-            <div className="font-bold text-4xl justify-start  "  > Best Deals
+                    return (
+                        <div key={card.id} className="mb-8 sm:mb-12 w-full">
+                            <h2 className="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-black mb-4 px-2">
+                                {card.title}
+                            </h2>
 
+                            <div className="relative group">
+                                <button
+                                    onClick={() => scrollLeft(card.id)}
+                                    className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-red-600 rounded-full p-2 shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 transition-all focus:outline-none duration-200"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+
+                                <section 
+                                    id={card.id} 
+                                    className="flex flex-nowrap overflow-x-auto overflow-y-hidden pb-4 gap-3 sm:gap-4 px-2 justify-start snap-x no-scrollbar"
+                                >
+                                    {items.map(item => (
+                                        <div 
+                                            key={item._id} 
+                                            className="box rounded-xl border bg-gray-100 border-black w-56 sm:w-64 md:w-72 shrink-0 snap-start flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                                            style={{ height: 'auto', minHeight: '24rem' }}
+                                        >
+                                            <div className="h-32 sm:h-40 md:h-44 w-full overflow-hidden shrink-0">
+                                                <img
+                                                    className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
+                                                    src={item.image || getDefaultImage(item.name, item.category)}
+                                                    alt={item.name}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 text-center flex-1 bg-white">
+                                                <h1 className="w-full font-bold text-sm sm:text-base md:text-lg leading-tight text-black line-clamp-2">{item.name}</h1>
+                                                <span className='font-semibold text-xs sm:text-sm md:text-base text-black'>PKR {item.price?.toLocaleString()}</span>
+                                                <p className="text-black text-xs sm:text-sm leading-snug line-clamp-3 overflow-hidden w-full">{item.description}</p>
+                                                <button 
+                                                    onClick={() => handleAddToCart(item.name, item.price)}
+                                                    className="add-to-cart w-full mt-auto font-bold text-xs sm:text-sm md:text-base bg-[rgb(199,16,46)] hover:bg-red-700 text-white py-1.5 sm:py-2 transition duration-105 ease-in-out rounded-lg shadow-md"
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </section>
+
+                                <button
+                                    onClick={() => scrollRight(card.id)}
+                                    className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-red-600 rounded-full p-2 shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 transition-all focus:outline-none duration-200"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
-
-            <div className="first flex  justify-center rounded-xl  m-0 p-3 w-full">
-
-                <div className="box rounded-lg border bg-white border-black m-4 w-72 h-96 overflow-hidden flex flex-col" style={{ width: '18rem', height: '24rem' }}>
-                    <img className="w-full h-1/2 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="Deal 2 image.webp" alt="Delicious Pepperoni Pizza" />
-                    <div className="h-1/2 flex flex-col items-center gap-2   p-3 text-center">
-                        <h1 className="w-full font-semibold text-md whitespace-nowrap  text-black" style={{ height: '1.5em', width: '100%' }}>DEAL FOR 2</h1>
-                        <span className=' text-black'>PKR 2599.00</span>
-                        <p className="text-black text-sm leading-tight">1 Medium Pizza(Classic)2pcs Garlic Bread + 2 Small Drink</p>
-                        <button onClick={() => handleAddToCart('DEAL FOR 2', 2599.00)}
-                            className="add-to-cart border border-black rounded-xl bg-red-500 hover:bg-red-600  px-3 py-1 mt-3 ">Add
-                            to chart</button>
-                    </div>
-                </div>
-
-                <div className="box rounded-lg border border-black bg-white m-4 w-72 h-96 overflow-hidden flex flex-col" style={{ width: '18rem', height: '24rem' }}>
-                    <img className="w-full h-1/2 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="Deal 2 image.webp" alt="Pizza"></img>
-                    <div className="h-1/2 flex flex-col items-center gap-2 p-3 text-center">
-
-                        <h1 className=" text-black " >DEAL FOR 3</h1>
-                        <span className=' text-black'>1899.00</span>
-                        <p className="text-black text-sm leading-tight">1 Lrg Pizza (Classic)+ 8pcs Wings +1Lrg Drink</p>
-                        <button onClick={() => handleAddToCart('DEAL FOR 3', 1899.00)}
-                            className="add-to-cart border border-black rounded-xl bg-red-500 hover:bg-red-600  px-3 py-1 mt-3  ">Add
-                            to chart</button>
-                    </div>
-                </div>
-
-                <div className="box rounded-lg border border-black bg-white m-4 w-72 h-96 overflow-hidden flex flex-col" style={{ width: '18rem', height: '24rem' }}>
-                    <img className="w-full h-1/2 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="Deal 2 image.webp" alt="Pizza"></img>
-
-                    <div className="h-1/2 flex flex-col items-center gap-2 p-3 text-center">
-
-                        <h1 className="w-full font-bold text-lg whitespace-nowrap  text-black" style={{ height: '1.5em', width: '100%' }}>Family Deal</h1>
-                        <span className=' text-black'>PKR 3999.00</span>
-
-                        <p className="text-black text-sm leading-tight">2 Medium Pizza (Classic) +4 pcs Garlic Bread+1 Lrg Drink</p>
-                        <button onClick={() => handleAddToCart('Family Deal', 3999.00)}
-                            className="add-to-cart border border-black rounded-xl bg-red-500 hover:bg-red-600  px-3 py-1 mt-3 ">Add
-                            to chart</button>
-                    </div>
-                </div>
-
-
-                <div className="box  rounded-lg border border-black bg-white m-4 w-72 h-96 overflow-hidden flex flex-col" style={{ width: '18rem', height: '24rem' }}>
-                    <img className="w-full h-1/2 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="Deal 2 image.webp" alt="Pizza"></img>
-                    <div className="h-1/2 flex flex-col items-center gap-2 p-3 text-center">
-                        <h1 className="w-full font-bold text-lg whitespace-nowrap  text-black" style={{ height: '1.5em', width: '100%' }}>FAMILY DEAL LARGE</h1>
-                        <span className=' text-black'>PKR 4999.00</span>
-                        <p className="text-black text-sm leading-tight">2 Lrg Pizza ( Classic)+6pcs Garlic Bread +1 Lrg Drink</p>
-                        <button onClick={() => handleAddToCart('FAMILY DEAL LARGE', 4999.00)}
-                            className="add-to-cart border border-black rounded-xl bg-red-500 hover:bg-red-600 px-3 py-1 mt-3  text-black ">Add
-                            to chart</button>
-                    </div>
-                </div>
-
-
-            </div>
-
-
-            <div className="font-bold text-4xl text-black ">
-                Explore Deals
-
-            </div>
-
-            <div className="first  p-4 m-3  w-full">
-
-
-                <div className="flex ">
-                    <div className="dealbox rounded-lg border border-black m-4 w-64 h-64 overflow-hidden flex flex-col">
-                        <img className="w-full flex-1 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="ramdan deal 1.webp" alt="deal"></img>
-                        <button onClick={() => handleAddToCart("Ramdan Deal", 3900)}
-                            className="w-full mt-auto font-bold text-xl hover:bg-red-500 transition-colors duration-300 p-2 bg-white  text-black">Ramdan
-                            Deal</button>
-                    </div>
-
-                    <div className="dealbox rounded-lg border border-black m-4 w-64 h-64 overflow-hidden flex flex-col">
-                        <img className="w-full flex-1 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="jazz deal.webp" alt="deal"></img>
-                        <button onClick={() => handleAddToCart('Jazz Deal', 2299.00)}
-                            className="w-full mt-auto font-bold text-xl hover:bg-red-500 transition-colors duration-300 p-2 bg-white  text-black">Jazz
-                            Deal</button>
-                    </div>
-
-                    <div className="dealbox rounded-lg border border-black m-4 w-64 h-64 overflow-hidden flex flex-col">
-                        <img className="w-full flex-1 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="midnight deal.webp" alt="deal"></img>
-                        <button onClick={() => handleAddToCart('Midnight Deal', 4999.00)}
-                            className="w-full mt-auto font-bold text-xl hover:bg-red-500 transition-colors duration-300 p-2 bg-white  text-black">Midnight
-                            Deal</button>
-                    </div>
-
-                    <div className="dealbox  rounded-lg border border-black m-4 w-64 h-64 overflow-hidden flex flex-col">
-                        <img className="w-full flex-1 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="hut deal.webp" alt="deal"></img>
-                        <button onClick={() => handleAddToCart('Hut Deal', 2999.00)}
-                            className="w-full mt-auto font-bold text-xl hover:bg-red-500 transition-colors duration-300 p-2 bg-white  text-black">Hut
-                            Deal</button>
-                    </div>
-
-
-                </div>
-
-            </div>
-
-
-            <div className="font-bold text-4xl text-black ">
-                Best Seller
-            </div>
-            <div className="bestseller ">
-                <div className="flex products  justify-center p-4 m-3  w-full">
-                    <div className="sellerbox  bg-gray-100 m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="Chicken Fagita.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight  text-black">Chicken Fagita</h1>
-                        <p className="text-black font-semibold">price: 2299.00</p>
-                        <p className="text-black text-sm leading-5 flex-1 overflow-hidden ">One of over classic,the Chicken Fagita pizza is
-                            made with spicy Chicken fagita and green...</p>
-
-                        <button onClick={() => handleAddToCart('Chicken Fagita', 2299.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)]  py-2">Add</button>
-
-                    </div>
-
-                    <div className="sellerbox bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="Spicy Chicken Ranch.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight  text-black">Spicy Chicken Ranch</h1>
-                        <span className="font-semibold  text-black">2199.00</span>
-                        <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Spicy Chicken Ranch Pizza features tender,spicy
-                            chicken fajita paired with a....</p>
-
-                        <button onClick={() => handleAddToCart('Spicy Chicken Ranch', 2199.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)]  py-2">Add</button>
-
-                    </div>
-
-                    <div className="sellerbox bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="very veggie.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight  text-black">Very Veggie</h1>
-                        <span className="font-semibold  text-black">1999.00</span>
-                        <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Spicy Chicken Ranch Pizza features tender,spicy
-                            chicken fajita paired with a....</p>
-
-                        <button onClick={() => handleAddToCart('Very Veggie', 1999.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2">Add</button>
-
-                    </div>
-
-                    <div className="sellerbox bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="Chicken Fagita.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg text-black leading-tight">Chicken Fagita</h1>
-                        <span className="font-semibold  text-black">1999.00</span>
-                        <p className="text-black text-sm leading-5 flex-1 overflow-hidden">Spicy Chicken Ranch Pizza features tender,spicy
-                            chicken fajita paired with a....</p>
-
-                        <button onClick={() => handleAddToCart('Chicken Fagita', 1999.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)]  py-2">Add</button>
-
-                    </div>
-                </div>
-
-            </div>
-
-            <div className="first m-0 p-3  w-full">
-                <div className="font-bold text-4xl text-black">
-                    Discount Deals
-
-                </div>
-
-                <div className="discountdeals flex">
-                    <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="appetizer platter.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight">Appetizer Platter</h1>
-                        <span className="font-semibold"><del>PkR 3000</del> PKR 1999.00</span>
-                        <p className="text-sm leading-5 flex-1 overflow-hidden">12 Wedges, 6 Chicken Wings, 4 Bihari Spin Rolls,
-                            1 Dip</p>
-
-                        <button onClick={() => handleAddToCart('Appetizer Platter', 1999.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2">Add</button>
-
-                    </div>
-
-                    <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="bihari chicken spin rool.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight">Bihari Chicken spin Rool</h1>
-                        <span className="font-semibold"><del>PkR 2500</del> 1999.00</span>
-                        <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Bihari Chicken Spin Rolls 2pcs</p>
-
-                        <button onClick={() => handleAddToCart('Bihari Chicken spin Rool', 1999.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2">Add</button>
-
-                    </div>
-
-                    <div className="Dealbox rounded-lg bg-gray-100 m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="wings.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg leading-tight">Dynamite wings</h1>
-                        <span className="font-semibold"><del>PkR 2700</del> 1999.00</span>
-                        <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Zesty dynamite sauce at the bottom and top</p>
-
-                        <button onClick={() => handleAddToCart('Dynamite wings', 1999.00)}
-                            className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)]  py-2">Add</button>
-
-                    </div>
-
-                    <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                        <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                            src="patato wedges.webp" alt="fijita"></img>
-                        <h1 className="font-bold text-lg  ">Patato Wedges</h1>
-                        <span className="font-semibold"><del>PkR 1700</del> 999.00</span>
-                        <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Patato wedges</p>
-
-                        <button onClick={() => handleAddToCart('Patato Wedges', 999.00)}
-                            className="add-to-cart  w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2 hover:scal-105 transition duration-105  ease-in-out ">Add</button>
-
-                    </div>
-                </div>
-
-            </div>
-
-
-            <div className="font-bold text-4xl text-black">
-                Drinks
-            </div>
-
-            <section id="drinks" className="drinks flex">
-                <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                    <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="water bottel.webp" alt="fijita"></img>
-                    <h1 className="font-bold text-lg leading-tight">AquaFina</h1>
-                    <span className="font-semibold"><del>PkR 300</del> PKR 150</span>
-                    <p className="text-sm leading-5 flex-1 overflow-hidden">Aquafina bottle </p>
-
-                    <button onClick={() => handleAddToCart('AquaFina', 150.00)}
-                        className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2">Add</button>
-
-                </div>
-
-                <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                    <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="pepsi bottle.webp" alt="fijita"></img>
-                    <h1 className="font-bold text-lg leading-tight">PEPSI</h1>
-                    <span className="font-semibold"><del>PkR 150</del> 99.00</span>
-                    <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Pepsi bottle</p>
-
-                    <button onClick={() => handleAddToCart('PEPSI', 99.00)}
-                        className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2">Add</button>
-
-                </div>
-
-                <div className="Dealbox rounded-lg bg-gray-100 m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                    <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="7up bottle.webp" alt="fijita"></img>
-                    <h1 className="font-bold text-lg leading-tight">7 UP</h1>
-                    <span className="font-semibold"><del>PkR 150</del> 99.00</span>
-                    <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">7up bottle</p>
-
-                    <button onClick={() => handleAddToCart('7 UP', 99.00)}
-                        className="add-to-cart w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)]  py-2">Add</button>
-
-                </div>
-
-                <div className="Dealbox rounded-lg bg-gray-100  m-4 w-72 h-112 overflow-hidden flex flex-col p-3 gap-2">
-
-                    <img className="w-full h-44 object-cover transform transition-transform duration-300 hover:scale-110"
-                        src="Mirinda bottle.webp" alt="fijita"></img>
-                    <h1 className="font-bold text-lg  ">Marinda</h1>
-                    <span className="font-semibold"><del>PkR 150</del> 99.00</span>
-                    <p className="text-black  text-sm leading-5 flex-1 overflow-hidden">Marinda bottle  </p>
-
-                    <button onClick={() => handleAddToCart('Mirinda', 99.00)}
-                        className="add-to-cart  w-full mt-auto font-bold text-xl bg-[rgb(199,16,46)] hover:bg-[rgb(199,16,46)] py-2 hover:scal-105 transition duration-105  ease-in-out ">Add</button>
-
-                </div>
-            </section>
-
-
-
-        </>
-    )
+        </div>
+    );
 }
 
-export default Menu
+export default Menu;

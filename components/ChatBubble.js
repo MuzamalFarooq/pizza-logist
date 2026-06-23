@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 export default function ChatBubble() {
     const { data: session } = useSession();
     const [activeOrder, setActiveOrder] = useState(null);
+    const [verifying, setVerifying] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState("");
@@ -14,43 +15,74 @@ export default function ChatBubble() {
     const socketRef = useRef(null);
     const chatEndRef = useRef(null);
 
-    // Load active order details
-    const loadActiveOrder = () => {
-        if (typeof window !== "undefined") {
+    useEffect(() => {
+        const verifyAndLoadOrder = async () => {
+            if (typeof window === "undefined") return;
+            const saved = localStorage.getItem("pizza_logist_active_order");
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    const res = await fetch(`/api/orders?orderId=${parsed.orderId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const status = data.order?.status;
+                        if (status === "delivered" || status === "cancelled") {
+                            console.log(`Order already ${status}. Clearing active chat.`);
+                            localStorage.removeItem("pizza_logist_active_order");
+                            setActiveOrder(null);
+                        } else {
+                            setActiveOrder(parsed);
+                            // Load chat history
+                            const history = localStorage.getItem(`chat_history_${parsed.orderId}`);
+                            if (history) {
+                                setMessages(JSON.parse(history));
+                            } else {
+                                const welcomeMsg = {
+                                    sender: "restaurant",
+                                    text: `Hi ${parsed.customerName || 'there'}! Thanks for your order. We are preparing your delicious pizza. Let us know if you have any questions!`,
+                                    createdAt: new Date().toISOString()
+                                };
+                                setMessages([welcomeMsg]);
+                                localStorage.setItem(`chat_history_${parsed.orderId}`, JSON.stringify([welcomeMsg]));
+                            }
+                        }
+                    } else {
+                        // Clear active order if not found in database
+                        localStorage.removeItem("pizza_logist_active_order");
+                        setActiveOrder(null);
+                    }
+                } catch (e) {
+                    console.error("Error verifying active order:", e);
+                    localStorage.removeItem("pizza_logist_active_order");
+                    setActiveOrder(null);
+                }
+            } else {
+                setActiveOrder(null);
+            }
+            setVerifying(false);
+        };
+
+        verifyAndLoadOrder();
+
+        const handleOrderChange = () => {
             const saved = localStorage.getItem("pizza_logist_active_order");
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
                     setActiveOrder(parsed);
-                    // Load chat history
-                    const history = localStorage.getItem(`chat_history_${parsed.orderId}`);
-                    if (history) {
-                        setMessages(JSON.parse(history));
-                    } else {
-                        // Default welcome message
-                        const welcomeMsg = {
-                            sender: "restaurant",
-                            text: `Hi ${parsed.customerName || 'there'}! Thanks for your order. We are preparing your delicious pizza. Let us know if you have any questions!`,
-                            createdAt: new Date().toISOString()
-                        };
-                        setMessages([welcomeMsg]);
-                        localStorage.setItem(`chat_history_${parsed.orderId}`, JSON.stringify([welcomeMsg]));
-                    }
+                    const welcomeMsg = {
+                        sender: "restaurant",
+                        text: `Hi ${parsed.customerName || 'there'}! Thanks for your order. We are preparing your delicious pizza. Let us know if you have any questions!`,
+                        createdAt: new Date().toISOString()
+                    };
+                    setMessages([welcomeMsg]);
+                    localStorage.setItem(`chat_history_${parsed.orderId}`, JSON.stringify([welcomeMsg]));
+                    setIsOpen(true);
                 } catch (e) {
-                    console.error("Error parsing active order:", e);
+                    console.error("Error loading order from event:", e);
                 }
-            } else {
-                setActiveOrder(null);
             }
-        }
-    };
-
-    useEffect(() => {
-        loadActiveOrder();
-
-        const handleOrderChange = () => {
-            loadActiveOrder();
-            setIsOpen(true); // Automatically expand the chat bubble when a new order is placed
+            setVerifying(false);
         };
 
         window.addEventListener("activeOrderChanged", handleOrderChange);
@@ -58,30 +90,6 @@ export default function ChatBubble() {
             window.removeEventListener("activeOrderChanged", handleOrderChange);
         };
     }, []);
-
-    // Verify order status on mount or when orderId changes
-    useEffect(() => {
-        if (!activeOrder?.orderId) return;
-
-        const checkOrderStatus = async () => {
-            try {
-                const res = await fetch(`/api/orders?orderId=${activeOrder.orderId}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.order?.status === "delivered" || data.order?.status === "cancelled") {
-                        console.log(`Order already ${data.order.status}. Clearing active chat.`);
-                        localStorage.removeItem("pizza_logist_active_order");
-                        setActiveOrder(null);
-                        setIsOpen(false);
-                    }
-                }
-            } catch (err) {
-                console.error("Error checking order status:", err);
-            }
-        };
-
-        checkOrderStatus();
-    }, [activeOrder?.orderId]);
 
     // Set up Socket.io connection when activeOrder is present
     useEffect(() => {
@@ -134,19 +142,34 @@ export default function ChatBubble() {
         }
     }, [messages, isOpen]);
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!inputText.trim() || !socketRef.current || !activeOrder?.orderId) return;
+        const textToSend = inputText.trim();
+        if (!textToSend || !socketRef.current || !activeOrder?.orderId) return;
 
         const messageData = {
             orderId: activeOrder.orderId,
             sender: "customer",
-            text: inputText.trim()
+            text: textToSend
         };
 
         // Send to socket server
         socketRef.current.emit("send_message", messageData);
         setInputText("");
+
+        // Send push notification to admin asynchronously
+        try {
+            fetch("/api/notifications/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId: activeOrder.orderId,
+                    text: textToSend
+                })
+            });
+        } catch (err) {
+            console.error("Error sending push notification for chat:", err);
+        }
     };
 
     // Clear active order / close chat session
@@ -164,7 +187,7 @@ export default function ChatBubble() {
     // Hide chat bubble if logged in as admin
     if (session?.user?.role === "admin") return null;
 
-    if (!activeOrder) return null;
+    if (verifying || !activeOrder) return null;
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
