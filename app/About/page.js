@@ -18,7 +18,7 @@ const About = () => {
           <div className="flex justify-center items-center">
             <div className="w-full max-w-md aspect-square bg-white rounded-2xl shadow-2xl overflow-hidden">
               <Image
-                src="/founder.jpg"
+                src="/founder.jpeg"
                 alt="Muzamal Farooq - Founder"
                 width={500}
                 height={500}

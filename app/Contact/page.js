@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { ToastContainer, toast, Bounce } from 'react-toastify'
 
-const contact = () => {
+const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -84,7 +84,7 @@ const contact = () => {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6">Contact Us</h1>
-                    <p className="text-xl text-gray-600">We'd love to hear from you. Get in touch with us today.</p>
+                    <p className="text-xl text-gray-600">We&apos;d love to hear from you. Get in touch with us today.</p>
                 </div>
 
                 {/* Main Content - Two Column Layout */}
@@ -227,11 +227,11 @@ const contact = () => {
                             <h2 className="text-3xl font-bold text-gray-900 mb-10">Get in Touch</h2>
 
                             {/* Email */}
-                            <div className="mb-10 pb-10 border-b-2 border-gray-200">
+                            <div className="mb-10 pb-10  border-b-2 border-gray-200">
                                 <div className='font-bold text-gray-500 uppercase tracking-wide text-sm mb-3'>Email</div>
-                                <div className='text-2xl font-bold text-red-600'>
-                                    <a href="mailto:Muzjani327@gmail.com" className="hover:text-red-700 transition-colors">
-                                        Muzjani327@gmail.com
+                                <div className='text-xl font-bold text-red-600'>
+                                    <a href="mailto:muzamalfarooq111@gmail.com" className="hover:text-red-700 transition-colors">
+                                        muzamalfarooq111@gmail.com
                                     </a>
                                 </div>
                             </div>
@@ -240,8 +240,8 @@ const contact = () => {
                             <div className="mb-10 pb-10 border-b-2 border-gray-200">
                                 <div className='font-bold text-gray-500 uppercase tracking-wide text-sm mb-3'>Phone</div>
                                 <div className='text-2xl font-bold text-red-600'>
-                                    <a href="tel:+923117473427" className="hover:text-red-700 transition-colors">
-                                        +92 311 7473427
+                                    <a href="tel:+923067774327" className="hover:text-red-700 transition-colors">
+                                        +92 3067774327
                                     </a>
                                 </div>
                             </div>
@@ -275,4 +275,4 @@ const contact = () => {
     )
 }
 
-export default contact
+export default Contact

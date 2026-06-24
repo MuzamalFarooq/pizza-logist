@@ -91,19 +91,21 @@ const Navbar = () => {
     return (
         <>
             <div className='navbar sticky top-0 z-50 flex h-12 sm:h-14 md:h-16 m-1 sm:m-2 rounded-lg sm:rounded-2xl justify-between items-center px-2 sm:px-3 md:px-4 gap-2 sm:gap-3'
-                style={{ backgroundImage: "url('/welcomepizza.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                // style={{ backgroundImage: "url('/welcomepizza.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+                style={{ backgroundColor: '#cc2027' }}
+                >
 
                 {/* Animated Logo */}
                 <Link href="/" className="flex items-center gap-1 sm:gap-2 group cursor-pointer">
                     <img 
                         src="/logo.png" 
                         alt="Pizza Logist Logo" 
-                        className="w-8 h-8 sm:w-10 sm:h-10 object-contain transition-all duration-300 transform group-hover:scale-110 shrink-0" 
+                        className="h-10 w-auto max-h-full object-contain transition-all duration-300 transform group-hover:scale-110 shrink-0" 
                     />
-                    <div className=" flex-col hidden sm:flex">
+                    {/* <div className=" flex-col hidden sm:flex">
                         <span className="text-white font-black text-sm sm:text-lg tracking-wider uppercase leading-none" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}>Pizza</span>
                         <span className="text-yellow-400 font-extrabold text-[9px] sm:text-[11px] tracking-widest uppercase leading-none mt-0.5" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.6)' }}>Logist</span>
-                    </div>
+                    </div> */}
                 </Link>
 
                 {/* Search Bar */}

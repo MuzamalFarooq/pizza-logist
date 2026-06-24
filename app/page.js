@@ -89,8 +89,8 @@ export default function Home() {
   return (
     <>
       <div className='welcome flex flex-row overflow-x-auto snap-x snap-mandatory no-scrollbar relative border rounded-lg sm:rounded-xl border-black w-[calc(100%-0.5rem)] sm:w-[calc(100%-1rem)] h-40 sm:h-52 md:h-64 m-1 sm:m-2 mx-auto overflow-hidden'>
-        <img className='w-full h-full object-cover shrink-0 snap-center' src="/welcomepizza.webp" alt="welcome pizza 1" />
         <img className='w-full h-full object-cover shrink-0 snap-center' src="/stuffed cheese crust.webp" alt="welcome pizza 2" />
+        <img className='w-full h-full object-cover shrink-0 snap-center' src="/welcomepizza.webp" alt="welcome pizza 1" />
         <img className='w-full h-full object-cover shrink-0 snap-center' src="/triple nine treat.webp" alt="welcome pizza 2" />
       </div>
 
