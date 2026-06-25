@@ -2,11 +2,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
     const { data: session } = useSession();
     const { cart, toggleCart, addToCart } = useCart();
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [menuItems, setMenuItems] = useState([]);
@@ -231,7 +233,7 @@ const Navbar = () => {
                         </div>
                     ) : (
                         <button 
-                            onClick={() => signIn()}
+                            onClick={() => router.push('/login')}
                             className="relative overflow-hidden group px-3 md:px-4 lg:px-6 py-1.5 md:py-2 rounded-full bg-red-600 text-white text-xs md:text-sm font-extrabold shadow-lg transition-all duration-300 hover:bg-red-700 hover:shadow-red-500/50 active:scale-95"
                         >
                             <span className="relative z-10">Sign In</span>
@@ -303,7 +305,7 @@ const Navbar = () => {
                             </div>
                         ) : (
                             <button 
-                                onClick={() => { signIn(); setShowMobileMenu(false); }}
+                                onClick={() => { router.push('/login'); setShowMobileMenu(false); }}
                                 className="w-full mx-4 px-4 py-2 bg-yellow-400 text-red-600 rounded-lg text-sm font-bold hover:bg-yellow-300 transition-colors"
                             >
                                 Sign In
