@@ -106,7 +106,7 @@ export const metadata = {
   },
 
   verification: {
-    // google: "YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE",  // ← Add your code here after verifying in Google Search Console
+    google: "3HD1KvJVan17_ZgS-r6XTiBpOXEJugi6-CH0XRVE3rI",  // ← Add your code here after verifying in Google Search Console
     // bing: "YOUR_BING_WEBMASTER_VERIFICATION_CODE",
   },
 };
